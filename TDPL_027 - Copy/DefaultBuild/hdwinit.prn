@@ -1,0 +1,41 @@
+RL78 Family Assembler V1.12.00.04 Assemble Source List
+
+OFFSET   CODE                  NO  SOURCE STATEMENT
+
+00000000                        1  ; Copyright (C) 2014 Renesas Electronics Corporation
+00000000                        2  ; RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY.
+00000000                        3  ; This program must be used solely for the purpose for which
+00000000                        4  ; it was furnished by Renesas Electronics Corporation. No part of this
+00000000                        5  ; program may be reproduced or disclosed to others, in any
+00000000                        6  ; form, without the prior written permission of Renesas Electronics
+00000000                        7  ; Corporation.
+00000000                        8  ;---------------------------------------------------------------------
+00000000                        9  ;	_hdwinit
+00000000                       10  ;
+00000000                       11  ;	void _hdwinit(void);
+00000000                       12  ;
+00000000                       13  ;	input:
+00000000                       14  ;		NONE
+00000000                       15  ;	output:
+00000000                       16  ;		NONE
+00000000                       17  ;---------------------------------------------------------------------
+00000000                       18  
+00000000                       19  ;   NOTE       : THIS IS A TYPICAL EXAMPLE.
+00000000                       20  
+00000000                       21  	.PUBLIC	_hdwinit
+00000000                       22  
+00000000                       23  .textf	.CSEG	TEXTF
+00000000                       24  _hdwinit:
+00000000 D7                    25  	RET
+
+Section List
+Attr     Size                Name
+
+TEXTF                 1 (00000001) .textf
+
+Command Line Parameter
+Files (x86)\Renesas Electronics\CS+\CC\CC-RL\V1.12.00\Bin\asrl.exe" @C:\Users\FW1\AppData\Local\Temp\$ccrl000\hdwinit.asm.cmd 
+
+Command File Parameter
+-define=__RENESAS_VERSION__=0x01120000 -cpu=S3 -character_set=none -dev="C:\Program Files (x86)\Renesas Electronics\CS+\CC\Device\RL78\Devicefile\DR5F11TLG.DVF" -prn_path=DefaultBuild -debug -output="\\192.168.168.240\fw1\TDPL_027 - Copy\Output\hdwinit.obj" rlDevice\Source\hdwinit.asm 
+

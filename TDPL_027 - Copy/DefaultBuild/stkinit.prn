@@ -1,0 +1,83 @@
+RL78 Family Assembler V1.12.00.04 Assemble Source List
+
+OFFSET   CODE                  NO  SOURCE STATEMENT
+
+00000000                        1  ; Copyright (C) 2014 Renesas Electronics Corporation
+00000000                        2  ; RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY.
+00000000                        3  ; This program must be used solely for the purpose for which
+00000000                        4  ; it was furnished by Renesas Electronics Corporation. No part of this
+00000000                        5  ; program may be reproduced or disclosed to others, in any
+00000000                        6  ; form, without the prior written permission of Renesas Electronics
+00000000                        7  ; Corporation.
+00000000                        8  ;---------------------------------------------------------------------
+00000000                        9  ;	_stkinit
+00000000                       10  ;
+00000000                       11  ;	void _stkinit(void __near * stackbss);
+00000000                       12  ;
+00000000                       13  ;	input:
+00000000                       14  ;		stackbss = AX (#LOWW(_stackend))
+00000000                       15  ;	output:
+00000000                       16  ;		NONE
+00000000                       17  ;---------------------------------------------------------------------
+00000000                       18  
+00000000                       19  ;   NOTE       : THIS IS A TYPICAL EXAMPLE.
+00000000                       20  
+00000000                       21  	.PUBLIC	_stkinit
+00000000                       22  
+00000000                       23  .textf	.CSEG	TEXTF
+00000000                       24  _stkinit:
+00000000 16                    25  	MOVW	HL,AX		; stack_end_addr
+00000001 C80300                26  	MOV	[SP+3],#0x00	; [SP+0]-[SP+2] for return address
+00000004 AEF8                  27  	MOVW	AX,SP
+00000006 27                    28  	SUBW	AX,HL		; SUBW  AX,#LOWW _@STEND
+00000007 61D300                29  	BNH	$LSTINIT3	; goto end
+0000000A 315E                  30  	SHRW	AX,5		; loop count for 32 byte transfer
+0000000C 12                    31  	MOVW	BC,AX
+0000000D F6                    32  	CLRW	AX
+0000000E                       33  LSTINIT1:
+0000000E 43                    34  	CMPW	AX,BC
+0000000F DD00                  35  	BZ	$LSTINIT2
+00000011 BB                    36  	MOVW	[HL],AX
+00000012 BC02                  37  	MOVW	[HL+2],AX
+00000014 BC04                  38  	MOVW	[HL+4],AX
+00000016 BC06                  39  	MOVW	[HL+6],AX
+00000018 BC08                  40  	MOVW	[HL+8],AX
+0000001A BC0A                  41  	MOVW	[HL+10],AX
+0000001C BC0C                  42  	MOVW	[HL+12],AX
+0000001E BC0E                  43  	MOVW	[HL+14],AX
+00000020 BC10                  44  	MOVW	[HL+16],AX
+00000022 BC12                  45  	MOVW	[HL+18],AX
+00000024 BC14                  46  	MOVW	[HL+20],AX
+00000026 BC16                  47  	MOVW	[HL+22],AX
+00000028 BC18                  48  	MOVW	[HL+24],AX
+0000002A BC1A                  49  	MOVW	[HL+26],AX
+0000002C BC1C                  50  	MOVW	[HL+28],AX
+0000002E BC1E                  51  	MOVW	[HL+30],AX
+00000030 37                    52  	XCHW	AX,HL
+00000031 042000                53  	ADDW	AX,#0x20
+00000034 37                    54  	XCHW	AX,HL
+00000035 B3                    55  	DECW	BC
+00000036 EF00                  56  	BR	$LSTINIT1
+00000038                       57  LSTINIT2:
+00000038 AEF8                  58  	MOVW	AX,SP
+0000003A 47                    59  	CMPW	AX,HL
+0000003B DD00                  60  	BZ	$LSTINIT3	; goto end
+0000003D F6                    61  	CLRW	AX
+0000003E BB                    62  	MOVW	[HL],AX
+0000003F A7                    63  	INCW	HL
+00000040 A7                    64  	INCW	HL
+00000041 EF00                  65  	BR	$LSTINIT2
+00000043                       66  LSTINIT3:
+00000043 D7                    67  	RET
+
+Section List
+Attr     Size                Name
+
+TEXTF                68 (00000044) .textf
+
+Command Line Parameter
+Files (x86)\Renesas Electronics\CS+\CC\CC-RL\V1.12.00\Bin\asrl.exe" @C:\Users\FW1\AppData\Local\Temp\$ccrl000\stkinit.asm.cmd 
+
+Command File Parameter
+-define=__RENESAS_VERSION__=0x01120000 -cpu=S3 -character_set=none -dev="C:\Program Files (x86)\Renesas Electronics\CS+\CC\Device\RL78\Devicefile\DR5F11TLG.DVF" -prn_path=DefaultBuild -debug -output="\\192.168.168.240\fw1\TDPL_027 - Copy\Output\stkinit.obj" rlDevice\Source\stkinit.asm 
+

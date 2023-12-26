@@ -1,0 +1,248 @@
+RL78 Family Assembler V1.12.00.04 Assemble Source List
+
+OFFSET   CODE                  NO  SOURCE STATEMENT
+
+00000000                        1  ; Copyright (C) 2014, 2018 Renesas Electronics Corporation
+00000000                        2  ; RENESAS ELECTRONICS CONFIDENTIAL AND PROPRIETARY.
+00000000                        3  ; This program must be used solely for the purpose for which
+00000000                        4  ; it was furnished by Renesas Electronics Corporation. No part of this
+00000000                        5  ; program may be reproduced or disclosed to others, in any
+00000000                        6  ; form, without the prior written permission of Renesas Electronics
+00000000                        7  ; Corporation.
+00000000                        8  
+00000000                        9  ;   NOTE       : THIS IS A TYPICAL EXAMPLE.
+00000000                       10  
+00000000                       11  $IFNDEF __RENESAS_VERSION__
+00000000                       12  __RENESAS_VERSION__	.EQU	0x01000000
+00000000                       13  $ENDIF
+00000000                       14  
+00000000                       15  	.public	_start
+00000000                       16  	.public _exit
+00000000                       17  
+00000000                       18  ;-----------------------------------------------------------------------------
+00000000                       19  ;	RAM section
+00000000                       20  ;-----------------------------------------------------------------------------
+00000000                       21  .SECTION .dataR, DATA
+00000000                       22  .SECTION .sdataR, DATA
+00000000                       23  ; .SECTION .datafR, DATAF
+00000000                       24  ; .SECTION .textfR, TEXTF
+00000000                       25  
+00000000                       26  $IF (__RENESAS_VERSION__ < 0x01010000)	; for CC-RL V1.00
+00000000                       27  ;-----------------------------------------------------------------------------
+00000000                       28  ;	stack area
+00000000                       29  ;-----------------------------------------------------------------------------
+00000000                       30  ; !!! [CAUTION] !!!
+00000000                       31  ; Set up stack size suitable for a project.
+00000000                       32  .SECTION .stack_bss, BSS
+00000000                       33  _stackend:
+00000000                       34  	.DS     0x200
+00000000                       35  _stacktop:
+00000000                       36  $ENDIF
+00000000                       37  
+00000000                       38  ;-----------------------------------------------------------------------------
+00000000                       39  ;	RESET vector
+00000000                       40  ;-----------------------------------------------------------------------------
+00000000                       41  _start	.VECTOR	0
+00000000                       42  
+00000000                       43  ;-----------------------------------------------------------------------------
+00000000                       44  ;	startup
+00000000                       45  ;-----------------------------------------------------------------------------
+00000000                       46  .SECTION .text, TEXT
+00000000                       47  _start:
+00000000                       48  	;--------------------------------------------------
+00000000                       49  	; setting register bank
+00000000                       50  	;--------------------------------------------------
+00000000                       51  ;	SEL	RB0
+00000000                       52  
+00000000                       53  	;--------------------------------------------------
+00000000                       54  	; setting mirror area
+00000000                       55  	;--------------------------------------------------
+00000000                       56  ;	ONEB    !PMC		; mirror area = 10000-1FFFFH
+00000000                       57  
+00000000                       58  	;--------------------------------------------------
+00000000                       59  	; setting the stack pointer
+00000000                       60  	;--------------------------------------------------
+00000000                       61  $IF (__RENESAS_VERSION__ >= 0x01010000)
+00000000 CBF80000              62  	MOVW	SP,#LOWW(__STACK_ADDR_START)
+00000004                       63  $ELSE	; for CC-RL V1.00
+00000004                       64  	MOVW	SP,#LOWW(_stacktop)
+00000004                       65  $ENDIF
+00000004                       66  
+00000004                       67  	;--------------------------------------------------
+00000004                       68  	; initializing stack area
+00000004                       69  	;--------------------------------------------------
+00000004                       70  $IF (__RENESAS_VERSION__ >= 0x01010000)
+00000004 300000                71  	MOVW	AX,#LOWW(__STACK_ADDR_END)
+00000007                       72  $ELSE	; for CC-RL V1.00
+00000007                       73  	MOVW	AX,#LOWW(_stackend)
+00000007                       74  $ENDIF
+00000007 FC000000              75  	CALL	!!_stkinit
+0000000B                       76  
+0000000B                       77  	;--------------------------------------------------
+0000000B                       78  	; hardware initialization
+0000000B                       79  	;--------------------------------------------------
+0000000B FC000000              80  	CALL	!!_hdwinit
+0000000F                       81  
+0000000F                       82  	;--------------------------------------------------
+0000000F                       83  	; initializing BSS
+0000000F                       84  	;--------------------------------------------------
+0000000F                       85  	; clear external variables which doesn't have initial value (near)
+0000000F 360000                86  	MOVW	HL,#LOWW(STARTOF(.bss))
+00000012 300000                87  	MOVW	AX,#LOWW(STARTOF(.bss) + SIZEOF(.bss))
+00000015 EF00                  88  	BR	$.L2_BSS
+00000017                       89  .L1_BSS:
+00000017 CC0000                90  	MOV	[HL+0],#0
+0000001A A7                    91  	INCW	HL
+0000001B                       92  .L2_BSS:
+0000001B 47                    93  	CMPW	AX,HL
+0000001C DF00                  94  	BNZ	$.L1_BSS
+0000001E                       95  
+0000001E                       96  	; clear saddr variables which doesn't have initial value
+0000001E 360000                97  	MOVW	HL,#LOWW(STARTOF(.sbss))
+00000021 300000                98  	MOVW	AX,#LOWW(STARTOF(.sbss) + SIZEOF(.sbss))
+00000024 EF00                  99  	BR	$.L2_SBSS
+00000026                      100  .L1_SBSS:
+00000026 CC0000               101  	MOV	[HL+0],#0
+00000029 A7                   102  	INCW	HL
+0000002A                      103  .L2_SBSS:
+0000002A 47                   104  	CMPW	AX,HL
+0000002B DF00                 105  	BNZ	$.L1_SBSS
+0000002D                      106  
+0000002D                      107  	; clear external variables which doesn't have initial value (far)
+0000002D                      108  ;	MOV	ES,#HIGHW(STARTOF(.bssf))
+0000002D                      109  ;	MOVW	HL,#LOWW(STARTOF(.bssf))
+0000002D                      110  ;	MOVW	AX,#LOWW(STARTOF(.bssf) + SIZEOF(.bssf))
+0000002D                      111  ;	BR	$.L2_BSSF
+0000002D                      112  ;.L1_BSSF:
+0000002D                      113  ;	MOV	ES:[HL+0],#0
+0000002D                      114  ;	INCW	HL
+0000002D                      115  ;.L2_BSSF:
+0000002D                      116  ;	CMPW	AX,HL
+0000002D                      117  ;	BNZ	$.L1_BSSF
+0000002D                      118  
+0000002D                      119  	;--------------------------------------------------
+0000002D                      120  	; ROM data copy
+0000002D                      121  	;--------------------------------------------------
+0000002D                      122  	; copy external variables having initial value (near)
+0000002D 4100                 123  	MOV	ES,#HIGHW(STARTOF(.data))
+0000002F 320000               124  	MOVW	BC,#LOWW(SIZEOF(.data))
+00000032 EF00                 125  	BR	$.L2_DATA
+00000034                      126  .L1_DATA:
+00000034 B3                   127  	DECW	BC
+00000035 11490000             128  	MOV	A,ES:LOWW(STARTOF(.data))[BC]
+00000039 480000               129  	MOV	LOWW(STARTOF(.dataR))[BC],A
+0000003C                      130  .L2_DATA:
+0000003C F6                   131  	CLRW	AX
+0000003D 43                   132  	CMPW	AX,BC
+0000003E DF00                 133  	BNZ	$.L1_DATA
+00000040                      134  
+00000040                      135  	; copy saddr variables having initial value
+00000040 4100                 136  	MOV	ES,#HIGHW(STARTOF(.sdata))
+00000042 320000               137  	MOVW	BC,#LOWW(SIZEOF(.sdata))
+00000045 EF00                 138  	BR	$.L2_SDATA
+00000047                      139  .L1_SDATA:
+00000047 B3                   140  	DECW	BC
+00000048 11490000             141  	MOV	A,ES:LOWW(STARTOF(.sdata))[BC]
+0000004C 480000               142  	MOV	LOWW(STARTOF(.sdataR))[BC],A
+0000004F                      143  .L2_SDATA:
+0000004F F6                   144  	CLRW	AX
+00000050 43                   145  	CMPW	AX,BC
+00000051 DF00                 146  	BNZ	$.L1_SDATA
+00000053                      147  
+00000053                      148  	; copy external variables having initial value (far)
+00000053                      149  ;	MOVW	BC,#LOWW(SIZEOF(.dataf))
+00000053                      150  ;	BR	$.L2_DATAF
+00000053                      151  ;.L1_DATAF:
+00000053                      152  ;	DECW	BC
+00000053                      153  ;	MOV	ES,#HIGHW(STARTOF(.dataf))
+00000053                      154  ;	MOV	A,ES:LOWW(STARTOF(.dataf))[BC]
+00000053                      155  ;	MOV	ES,#HIGHW(STARTOF(.datafR))
+00000053                      156  ;	MOV	ES:LOWW(STARTOF(.datafR))[BC],A
+00000053                      157  ;.L2_DATAF:
+00000053                      158  ;	CLRW	AX
+00000053                      159  ;	CMPW	AX,BC
+00000053                      160  ;	BNZ	$.L1_DATAF
+00000053                      161  
+00000053                      162  	; copy .text to RAM
+00000053                      163  ;	MOV	C,#HIGHW(STARTOF(.textf))
+00000053                      164  ;	MOVW	HL,#LOWW(STARTOF(.textf))
+00000053                      165  ;	MOVW	DE,#LOWW(STARTOF(.textfR))
+00000053                      166  ;	BR	$.L2_TEXT
+00000053                      167  ;.L1_TEXT:
+00000053                      168  ;	MOV	A,C
+00000053                      169  ;	MOV	ES,A
+00000053                      170  ;	MOV	A,ES:[HL]
+00000053                      171  ;	MOV	[DE],A
+00000053                      172  ;	INCW	DE
+00000053                      173  ;	INCW	HL
+00000053                      174  ;	CLRW	AX
+00000053                      175  ;	CMPW	AX,HL
+00000053                      176  ;	SKNZ
+00000053                      177  ;	INC	C
+00000053                      178  ;.L2_TEXT:
+00000053                      179  ;	MOVW	AX,HL
+00000053                      180  ;	CMPW	AX,#LOWW(STARTOF(.text) + SIZEOF(.text))
+00000053                      181  ;	BNZ	$.L1_TEXT
+00000053                      182  
+00000053                      183  	;--------------------------------------------------
+00000053                      184  	; call main function
+00000053                      185  	;--------------------------------------------------
+00000053 FC000000             186  	CALL	!!_main		; main();
+00000057                      187  
+00000057                      188  	;--------------------------------------------------
+00000057                      189  	; call exit function
+00000057                      190  	;--------------------------------------------------
+00000057 F6                   191  	CLRW	AX		; exit(0)
+00000058                      192  _exit:
+00000058 EF00                 193  	BR	$_exit
+0000005A                      194  
+0000005A                      195  ;-----------------------------------------------------------------------------
+0000005A                      196  ;	section
+0000005A                      197  ;-----------------------------------------------------------------------------
+0000005A                      198  $IF (__RENESAS_VERSION__ >= 0x01010000)
+00000000                      199  .SECTION .RLIB, TEXTF
+00000000                      200  .L_section_RLIB:
+00000000                      201  .SECTION .SLIB, TEXTF
+00000000                      202  .L_section_SLIB:
+00000000                      203  $ENDIF
+00000000                      204  .SECTION .textf, TEXTF
+00000000                      205  .L_section_textf:
+00000000                      206  .SECTION .const, CONST
+00000000                      207  .L_section_const:
+00000000                      208  .SECTION .constf, CONSTF
+00000000                      209  .L_section_constf:
+00000000                      210  .SECTION .data, DATA
+00000000                      211  .L_section_data:
+00000000                      212  ;.SECTION .dataf, DATAF
+00000000                      213  ;.L_section_dataf:
+00000000                      214  .SECTION .sdata, SDATA
+00000000                      215  .L_section_sdata:
+00000000                      216  .SECTION .bss, BSS
+00000000                      217  .L_section_bss:
+00000000                      218  ;.SECTION .bssf, BSSF
+00000000                      219  ;.L_section_bssf:
+00000000                      220  .SECTION .sbss, SBSS
+00000000                      221  .L_section_sbss:
+
+Section List
+Attr     Size                Name
+
+TEXT                 90 (0000005A) .text
+TEXTF                 0 (00000000) .textf
+CONST                 0 (00000000) .const
+CONSTF                0 (00000000) .constf
+DATA                  0 (00000000) .data
+SDATA                 0 (00000000) .sdata
+BSS                   0 (00000000) .bss
+SBSS                  0 (00000000) .sbss
+DATA                  0 (00000000) .dataR
+DATA                  0 (00000000) .sdataR
+TEXTF                 0 (00000000) .RLIB
+TEXTF                 0 (00000000) .SLIB
+
+Command Line Parameter
+Files (x86)\Renesas Electronics\CS+\CC\CC-RL\V1.12.00\Bin\asrl.exe" @C:\Users\FW1\AppData\Local\Temp\$ccrl000\cstart.asm.cmd 
+
+Command File Parameter
+-define=__RENESAS_VERSION__=0x01120000 -cpu=S3 -character_set=none -dev="C:\Program Files (x86)\Renesas Electronics\CS+\CC\Device\RL78\Devicefile\DR5F11TLG.DVF" -prn_path=DefaultBuild -debug -output="\\192.168.168.240\fw1\TDPL_027 - Copy\Output\cstart.obj" rlDevice\Source\cstart.asm 
+

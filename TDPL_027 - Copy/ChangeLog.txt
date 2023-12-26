@@ -1,0 +1,75 @@
+852
+1. NM LOCK COUNT INCREADED FROM 5 TO 180
+2. DEFAULT CALIBRATION CHANGED .
+3. NM LOCK WILL RESET WHEN PUSH BUTTON IS PRESSED.
+4. NM EXIT TIME DUE TO FALSE CURRENT CHANGED TO 3 MINUTES FROM 50 MINUTES.
+853
+5. REMOVED VER# FROM DISPLAY
+6. NOW IT CAN BE READ FROM COMMUNICATION. COMMAND "EEOVER0D0A";
+
+
+862
+1. earth is blinking. which is not correct.
+2. dc immunity range new set.
+
+866
+1. change in nm logic in normal mode.
+
+868
+1. Change in production display parameters.
+2. removed blinking in production mode.
+3. now command added to change offset values for current.
+4. show rev icon in production mode.
+ 
+875
+1. dynamic offset added when current flows through CT.
+2. change nm case if voltage is less than 120V
+0.03.14
+1. erase blocked in user mode.
+0.03.15
+1. first billing happening in NM if there is not LS data logged in normal mode.
+0.03.16
+1. power on duration is coorected in case meter RUN in NM.
+
+0.03.17
+1. billing occurs while erased in NM case.
+0.03.17
+inavlid
+
+0.03.019
+1. ND detection logic changed in case if it is applied REV.
+2. i2c reset clock increased for i2c hang problem.
+
+1.04.017
+ 1. dc magnet immune logic changed.
+1.04.023
+1. meter will not run below 100V
+2. meter will comes only from power off mode if volatge is greater than 110V or if less than 110V and load is earthed.
+1.04.024
+1. meter takes time from battery mode to normal mode if supply is applied on portable source, if battery mode time is more than 5 mins.
+2. VRTC pin will get supply from MCU in AC supply condition.
+3. Now all seg will show when memtest command will be received in production mode.
+4. first stage powerfail data will be saved when voltage is less than 120V.
+4.65.000
+prekWh initial value changed.
+1. some times crc of data saved at power fail event mismatched. this is beacuse 12 bit timer counter modify pulse counter values after calculatiing crc.
+2. if there is no more than .1 kwh increament in one run, and kwh increased more than 3 kwh in such repeatition then kwh will become 0. now it is corrected.
+3. power fail data saved 1 level voltage chnaged to 120V. 
+
+900
+1. magnet logic changed.
+2. power assigned before tamper checking.
+
+904
+.1. NM accuracy flactuating.
+
+21
+1. magnet time will be 5 mins.
+
+10/07/2023-025
+1. nm volatge is now 70V , earlier was 90V
+2. default tod zones will be 4 as per given by prashant.
+10/07/2023-026
+1. there is no default energy calculation.
+11/07/2023-027
+1. now nd will also detect above 145% of Vref.
